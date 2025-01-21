@@ -38,3 +38,6 @@ def demo(question):
     response = llm.invoke([message])
     
     return response
+
+
+print (demo("你好, 請使用繁體中文").content)
