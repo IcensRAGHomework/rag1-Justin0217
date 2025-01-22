@@ -39,24 +39,9 @@ class HolidayAPI:
 
     @staticmethod
     def get_holiday(year: int, month: int) -> str:
-        #url = f"{HolidayAPI.BASE_URL}?&api_key={HolidayAPI.API_KEY}&country=tw&year={year}&month={month}"
-        url = f"https://calendarific.com/api/v2/holidays?&api_key=Da9B4H14FjzvH2jw5wYjPSjiArTJ7MQc&country=tw&year={year}&month={month}"
+        url = f"{HolidayAPI.BASE_URL}?&api_key={HolidayAPI.API_KEY}&country=tw&year={year}&month={month}"
         response = requests.get(url)
         return response.json().get('response')
-
-"""
-    @staticmethod
-    def get_holiday(year: int, month: int) -> Dict[str, Any]:
-        params = {
-            'api_key': HolidayAPI.API_KEY,
-            'country': 'tw',
-            'year': year,
-            'month': month
-        }
-        response = requests.get(HolidayAPI.BASE_URL, params=params)
-        response.raise_for_status()  # Raise exception for bad status codes
-        return response.json().get('response', {})
-"""
 
 class GetHolidaySchema(BaseModel):
     year: int = Field(description="specific year")
@@ -98,12 +83,6 @@ class OutputFormatter:
 
         output_parser = StructuredOutputParser(response_schemas=response_schemas)
         format_instructions = output_parser.get_format_instructions()
-        
-        """
-        print("##################")
-        print(data)
-        print("##################")
-        """
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", "將我提供的資料整理成指定格式,使用台灣語言,{format_instructions},有幾個答案就回答幾次,將所有答案使用台灣語言放進同個list"),
