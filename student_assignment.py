@@ -16,11 +16,12 @@ from langchain import hub
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
+history = ChatMessageHistory()
+
 class Config:
     def __init__(self):
         self.gpt_chat_version = 'gpt-4o'
         self.gpt_config = get_model_configuration(self.gpt_chat_version)
-        self.history = ChatMessageHistory()
 
     @lru_cache()
     def get_llm(self) -> AzureChatOpenAI:
@@ -65,9 +66,12 @@ class AgentManager:
         agent = create_openai_functions_agent(self.config.get_llm(), self.tools, prompt)
         agent_executor = AgentExecutor(agent=agent, tools=self.tools)
         
+        def get_history() -> ChatMessageHistory:
+            return history
+    
         return RunnableWithMessageHistory(
             agent_executor,
-            lambda: self.config.history,
+            get_history,
             input_messages_key="input",
             history_messages_key="chat_history",
         )
@@ -174,9 +178,7 @@ def generate_hw02(question: str) -> str:
     agent_manager = AgentManager(config)
     
     response = agent_manager.get_agent().invoke({"input": question}).get('output')
-    #print(response)
     response = OutputFormatter.format_holiday_output(llm, response)
-    #print(response)
     return OutputFormatter.format_result_output(llm, response, True)
 
 def generate_hw03(question2: str, question3: str) -> str:
